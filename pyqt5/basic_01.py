@@ -24,6 +24,7 @@ class MyApp(QWidget):
 
 
 if __name__ == '__main__':
+    # pyqt5의 모든 객체는 어플리케이션 객체를 생성해야 함
    app = QApplication(sys.argv)
    ex = MyApp()
    sys.exit(app.exec_())
