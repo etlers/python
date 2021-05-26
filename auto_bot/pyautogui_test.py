@@ -34,7 +34,7 @@ pg.drag(0, 300, 1, button='left')
 while True:
     print(pg.position())
     time.sleep(1)
-"""
+
 # 마우스 이동 (x 좌표, y 좌표)
 pg.moveTo(468, 287)
 pg.click()
@@ -44,3 +44,11 @@ pyperclip.copy('mac')
 pg.hotkey("ctrl", "v")
 #pg.typewrite("galaxy")
 pg.press("enter")
+"""
+while True:
+    pg.moveTo(1250, 300)
+    time.sleep(1)
+    pg.moveTo(1270, 200)
+    time.sleep(1)
+    pg.moveTo(1170, 250)
+    time.sleep(1)
