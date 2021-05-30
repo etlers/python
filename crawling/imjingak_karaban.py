@@ -5,7 +5,7 @@
 from selenium import webdriver
 import time, datetime, yaml
 
-selenium_dir = "../../chromedriver/"
+selenium_dir = "../chromedriver/"
 driver = webdriver.Chrome(selenium_dir + "chromedriver.exe")
 url = 'http://imjingakcamping.co.kr/resv/res_01.html'
 driver.get(url)
@@ -59,7 +59,6 @@ def reservation(zone_cd):
         position_tf = True
         try:
             tmp = driver.find_element_by_xpath(chk_position).text
-            print(chk_position, tmp, len(tmp))
         except:
             position_tf = False
 
@@ -73,9 +72,12 @@ def reservation(zone_cd):
     
     for num in range(dict_position[zone_cd][1]):
         pos = str(num + 1).zfill(2)
+        if driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[8]/div[11]/div[{pos}]/span").text == "마감":
+            print(zone_cd, dict_position[zone_cd])
         chk_position = f'//*[@id="{dict_position[zone_cd][0]}_{pos}"]'
         if review_checkbox(chk_position) == True:
             driver.find_element_by_xpath(f'/html/body/div[4]/div[1]/div/div[8]/div[{str(int(zone_cd)+1)}]/div[{num}]/label').click()
+            time.sleep(10)
             result_tf = True
             break
 
@@ -106,28 +108,28 @@ def execute():
                 resv_path = f'/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir+1}]/span[{ic+1}]/a'
                 try:
                     target_day = int(driver.find_element_by_xpath(resv_path).text)
+                    driver.find_element_by_xpath(f'/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir+1}]/span[{ic+1}]/a').click()
+                    time.sleep(0.5)
+                    empty_cnt_a = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[7]/span').text)
+                    empty_cnt_b = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[8]/span').text)
+                    empty_cnt_c = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[9]/span').text)
+                    # print(empty_cnt_a, empty_cnt_b, empty_cnt_c)
+                    if empty_cnt_a > 0:
+                        end_tf = reservation("8")
+                        if end_tf: return True
+                    if empty_cnt_b > 0:
+                        end_tf = reservation("9")
+                        if end_tf: return True
+                    if empty_cnt_c > 0:
+                        end_tf = reservation("10")
+                        if end_tf: return True
                 except:
-                    target_day = 0
-                if target_day == 0: continue
-                
-                driver.find_element_by_xpath(f'/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir+1}]/span[{ic+1}]/a').click()
-                time.sleep(0.5)
-                empty_cnt_a = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[7]/span').text)
-                empty_cnt_b = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[8]/span').text)
-                empty_cnt_c = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[9]/span').text)
-                # print(empty_cnt_a, empty_cnt_b, empty_cnt_c)
-                if empty_cnt_a > 0:
-                    end_tf = reservation("8")
-                    if end_tf: return True
-                if empty_cnt_b > 0:
-                    end_tf = reservation("9")
-                    if end_tf: return True
-                if empty_cnt_c > 0:
-                    end_tf = reservation("10")
-                    if end_tf: return True
+                    pass                
             except:
                 pass            
         if end_tf: return True
+        
+    return False
             
 
 if __name__ == "__main__":
