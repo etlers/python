@@ -1,11 +1,6 @@
 import random
 
 list_nums = []
-while True:
-    num = random.randint(1,14)
-    if num not in list_nums:
-        list_nums.append(num)
-    
-    if len(list_nums) == 14: break
+list_nums.append([5, 3, 6, 4, 2])
 
 print(list_nums)

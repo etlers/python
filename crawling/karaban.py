@@ -19,9 +19,11 @@ pgm_msg = """
 """
 print(pgm_msg)
 
-# 토요일 행 위치 지정. 2-7, 3-7, 4-7, 5-7, 6-7
+# 테이블에서 요일의 열 위치 지정. 행은 2 부터가 됨.
+# 일 ~ 토. 1 ~ 7
 day_col_num = 4
-list_day_num_ir = [5, 4, 6, 3, 2]
+# 해당 요일의 주의 행
+list_week_num_ir = [5, 4, 6, 3, 2]
 # 존에 대한 번호. xpath 배열 번호에 사용됨
 dict_zone_info = {
     "A": ["8", 14],
@@ -38,7 +40,7 @@ with open('./config.yaml', encoding="utf-8") as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
-# 받은 경로로 존(카라반존A, B, C) 클릭
+# 받은 경로로 존(카라반존 A, B, C) 클릭
 def click_zone(zone_path):
     # 존 명칭이 나올 때까지 대기
     while True:
@@ -183,7 +185,7 @@ def prepare_for_reservation(zone_cd):
                 except:
                     time.sleep(0.5)                
             # 지정한 일자 순서에 따라 확인
-            for ir in list_day_num_ir:                
+            for ir in list_week_num_ir:                
                 # 달력의 일자 가져오기
                 try:
                     calendar_day = driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir}]/span[{day_col_num}]/a").text
@@ -193,7 +195,7 @@ def prepare_for_reservation(zone_cd):
                 if len(calendar_day) == 0:
                     print(f"{ir}번째는 일자가 아닙니다.")
                     continue
-                # 달력 일자 선택
+                # 가져온 달력 일자를 선택
                 try:
                     driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir}]/span[{day_col_num}]/a").click()
                 except:
@@ -202,8 +204,7 @@ def prepare_for_reservation(zone_cd):
                     continue
                 # 달력 선택여부
                 # selected_tf = check_date_selected(calendar_day)
-                # 제대로 일자 선택이 됐다면
-                # 사이트 빈자리 추출
+                # 제대로 일자 선택이 됐다면 사이트 빈자리 추출
                 empty_cnt_a, empty_cnt_b, empty_cnt_c = site_count()
                 # 존에 빈자리가 있었다면
                 if ((zone_cd == "A" and empty_cnt_a > 0) or (zone_cd == "B" and empty_cnt_b > 0) or (zone_cd == "C" and empty_cnt_c > 0)):
@@ -233,7 +234,7 @@ def prepare_for_reservation(zone_cd):
         return True
 
 
-# 최초 팝업을 클릭해서 없애서 예약을 위한 사이트 체크로 들어감
+# 최초 팝업을 클릭해서 없애고 예약을 위한 사이트 체크로 들어감
 def execute(zone_cd):
     # 팝업 확인. 없을 수도 있음
     try:
