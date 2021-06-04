@@ -29,12 +29,9 @@ pg.scroll(10)
 # 드래그하기
 pg.drag(0, 300, 1, button='left')
 #542, 555
-"""
-"""
 while True:
     print(pg.position())
     time.sleep(1)
-
 # 마우스 이동 (x 좌표, y 좌표)
 pg.moveTo(468, 287)
 pg.click()
@@ -44,7 +41,7 @@ pyperclip.copy('mac')
 pg.hotkey("ctrl", "v")
 #pg.typewrite("galaxy")
 pg.press("enter")
-"""
+
 while True:
     pg.moveTo(1250, 300)
     time.sleep(1)
@@ -52,3 +49,15 @@ while True:
     time.sleep(1)
     pg.moveTo(1170, 250)
     time.sleep(1)
+"""
+pg.moveTo(2287, 1424)
+time.sleep(1)
+pg.click()
+time.sleep(1)
+pg.moveTo(2572, 82)
+time.sleep(1)
+pg.click()
+time.sleep(1)
+pg.write("https://etlers.slack.com/apps/A0F7XDUAZ-incoming-webhooks")
+
+pg.write("\n")

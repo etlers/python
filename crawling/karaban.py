@@ -23,7 +23,7 @@ print(pgm_msg)
 # 일 ~ 토. 1 ~ 7
 day_col_num = 4
 # 해당 요일의 주의 행
-list_week_num_ir = [5, 4, 6, 3, 2]
+list_week_num_ir = [2, 2, 5, 4, 6, 2, 3]
 # 존에 대한 번호. xpath 배열 번호에 사용됨
 dict_zone_info = {
     "A": ["8", 14],
@@ -152,21 +152,6 @@ def prepare_for_reservation(zone_cd):
                 time.sleep(0.1)
 
         return empty_cnt_a, empty_cnt_b, empty_cnt_c
-
-    # 날짜가 제대로 선택이 됐는지 확인. 선택이 안되면 우측 일자와 다름
-    def check_date_selected(calendar_day):
-        # 우측에 보이는 날짜
-        view_month = driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/div/strong[2]').text
-        view_day = driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/div/strong[3]').text
-        # 입력받은 날짜
-        in_month = resv_ym.split(" ")[1].replace("월","")
-        month_day = in_month + calendar_day.zfill(2)
-        print(month_day, view_month + view_day)
-        # 일치여부 확인
-        if month_day == view_month + view_day:
-            return True
-        else:
-            return False
     
     rsvym_tf = True
     # 지정한 월로 변경될 때까지 대기
@@ -202,8 +187,6 @@ def prepare_for_reservation(zone_cd):
                     # 회색의 경우 클릭이 안됨
                     print(f"{calendar_day}일은 선택할 수 없는 일자입니다.")
                     continue
-                # 달력 선택여부
-                # selected_tf = check_date_selected(calendar_day)
                 # 제대로 일자 선택이 됐다면 사이트 빈자리 추출
                 empty_cnt_a, empty_cnt_b, empty_cnt_c = site_count()
                 # 존에 빈자리가 있었다면
@@ -243,7 +226,7 @@ def execute(zone_cd):
         time.sleep(0.1)
     # 예약 사전 준비 및 사이트 확인
     if prepare_for_reservation(zone_cd):
-        reservation_click()
+        # reservation_click()
         pass
     else:
         print("예약 실패!!!")
@@ -277,7 +260,7 @@ if __name__ == "__main__":
         now = datetime.datetime.now()
         run_hms = now.strftime("%H%M%S")
         # 10시가 되면 시작하고 종료
-        if run_hms >= "134001":
+        if run_hms >= "100001":
             break
         else:
             # 대기

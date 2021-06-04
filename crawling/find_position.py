@@ -10,65 +10,50 @@ driver = webdriver.Chrome(selenium_dir + "chromedriver.exe")
 url = 'http://imjingakcamping.co.kr/resv/res_01.html'
 driver.get(url)
 
-resv_ym = "2021년 06월"
-list_yoil = [6, 7]
-
-# with open('./config.yaml', encoding="utf-8") as stream:
-#     try:
-#         dict_config = yaml.safe_load(stream)
-#         resv_ym = dict_config['resv_ym']
-#     except yaml.YAMLError as exc:
-#         print(exc)
-
 
 def reservation():
     pass
 
 def execute():
+
+    # 사이트의 남은 자리 확인
+    def site_count():
+        while True:
+            try:
+                empty_cnt_a = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[7]/span').text)
+                empty_cnt_b = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[8]/span').text)
+                empty_cnt_c = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[9]/span').text)
+                break
+            except:
+                time.sleep(0.1)
+
+        return empty_cnt_a, empty_cnt_b, empty_cnt_c
+
+    def check_day_avali(resv_path):        
+        driver.find_element_by_xpath(resv_path).click()        
+        # 제대로 일자 선택이 됐다면 사이트 빈자리 추출
+        empty_cnt_a, empty_cnt_b, empty_cnt_c = site_count()
+        print(empty_cnt_a, empty_cnt_b, empty_cnt_c)
     
-    select_count = 0
     # 팝업 확인. 없을 수도 있음
     try:
         driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/form/div/span/a').click()
     except:
         time.sleep(0.1)
-    # 6월로 선택
-    site_ym = driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[3]/div[1]/span').text
-    if site_ym != resv_ym:
-        while True:
-            try:
-                driver.find_element_by_xpath("/html/body/div[4]/div[1]/div/div[3]/div[1]/a[2]/span").click()
-                break
-            except:
-                time.sleep(0.1)
 
     list_weeks = [2, 3, 4, 5, 6, 7]
+    list_yoil = [6, 7]
+
     for week in list_weeks:
         for yoil in list_yoil:
             try:
                 resv_path = f'/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{week}]/span[{yoil}]/a'
                 calendar_day = driver.find_element_by_xpath(resv_path).text
+                print(calendar_day, week, yoil)        
+                check_day_avali(resv_path)                
             except:
-                calendar_day = ""
-            # 공백으로 일자가 아닌 경우
-            if len(calendar_day) == 0:
-                print(f"{week}번째는 일자가 아닙니다.")
+                print(f"[{week}, {yoil}] 위치는 일자가 아닙니다.")
                 continue
-            print(calendar_day, week, yoil)
-
-            driver.find_element_by_xpath(resv_path).click()
-            
-            rental_a_cnt = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[5]/span').text)
-            # if rental_a_cnt > 0:
-            #     end_tf = reservation(resv_path, "6")
-            #     if end_tf: break
-            rental_b_cnt = int(driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[4]/table/tbody/tr/td[6]/span').text)
-            # if rental_b_cnt > 0:
-            #     end_tf = reservation(resv_path, "7")
-            #     if end_tf: break
-            print(target_day, rental_a_cnt, rental_b_cnt)
-
-        # if end_tf: break
             
 
 if __name__ == "__main__":
