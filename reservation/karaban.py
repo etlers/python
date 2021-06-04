@@ -3,7 +3,7 @@
     화면을 띄운 후 다음 월로 변경을 하고 기다리면 10시에 시작을 함
 """
 from selenium import webdriver
-import time, datetime, yaml
+import time, datetime
 import argparse
 import random
 
@@ -14,16 +14,22 @@ driver.get(url)
 
 # 프로그램 메세지
 pgm_msg = """
-# 임진각 평화누리 캠핑장 카라반 빈자리 찾아서 예약하기
+# 임진각 평화누리 캠핑장 카라반 지정한 일자에 빈자리 찾아서 예약하기
 # 화면을 띄운 후 다음 월로 변경을 하고 기다리면 10시에 시작을 함
 """
 print(pgm_msg)
-
-# 테이블에서 요일의 열 위치 지정. 행은 2 부터가 됨.
-# 일 ~ 토. 1 ~ 7
-day_col_num = 4
-# 해당 요일의 주의 행
-list_week_num_ir = [2, 2, 5, 4, 6, 2, 3]
+# 입력인자 저장
+list_args = []
+# 요일 인덱스
+dict_yoil = {
+    1: "일", 
+    2: "월", 
+    3: "화", 
+    4: "수", 
+    5: "목", 
+    6: "금", 
+    7: "토",
+}
 # 존에 대한 번호. xpath 배열 번호에 사용됨
 dict_zone_info = {
     "A": ["8", 14],
@@ -31,14 +37,7 @@ dict_zone_info = {
     "C": ["10", 9],
 }
 # 존 자리 위치
-list_nums = []
-
-with open('./config.yaml', encoding="utf-8") as stream:
-    try:
-        dict_config = yaml.safe_load(stream)
-        resv_ym = dict_config['resv_ym']
-    except yaml.YAMLError as exc:
-        print(exc)
+list_zone_position = []
 
 # 받은 경로로 존(카라반존 A, B, C) 클릭
 def click_zone(zone_path):
@@ -59,7 +58,7 @@ def click_empty_site(zone_cd):
     click_tf = False
     zone_num = dict_zone_info[zone_cd][0]
     # 전체 개수를 돌면서 빈자리가 있는지 확인
-    for pos in list_nums:
+    for pos in list_zone_position:
         # 마감이 있으면 지나감
         try:
             magam = driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[8]/div[{int(zone_num)+1}]/div[{pos}]/span").text
@@ -72,6 +71,7 @@ def click_empty_site(zone_cd):
             break
 
     return click_tf
+
 
 def reservation_click():
     # 예약정보 입력
@@ -86,10 +86,11 @@ def reservation_click():
         find.clear()  # 글자 지움
         find.send_keys(text_value) # 글자 입력
 
+    # 대인 4명 선택
     while True:
         try:
             driver.find_element_by_xpath("/html/body/div[4]/div[1]/div/div[9]/form/div[1]/div/table/tbody/tr[1]/td[4]/select/option[5]").click()
-            print("사이트 선택")
+            print("인원 선택")
             break
         except:
             time.sleep(0.1)
@@ -153,49 +154,40 @@ def prepare_for_reservation(zone_cd):
 
         return empty_cnt_a, empty_cnt_b, empty_cnt_c
     
-    rsvym_tf = True
-    # 지정한 월로 변경될 때까지 대기
-    while rsvym_tf:
-        # 화면에서 달력의 년월 추출
-        site_ym = driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div[3]/div[1]/span').text
-        if site_ym == resv_ym:
-            # 달력이 선택 되었다는 의미
-            rsvym_tf = False
-            # 예약하기 버튼이 생성됐는지 확인. 있다면 화면이 떴다는 의미
-            while True:
-                try:
-                    rsv_btn = driver.find_element_by_xpath("/html/body/div[4]/div[1]/div/div[9]/div[2]/button").text
-                    time.sleep(0.1)
-                    break
-                except:
-                    time.sleep(0.5)                
-            # 지정한 일자 순서에 따라 확인
-            for ir in list_week_num_ir:                
-                # 달력의 일자 가져오기
-                try:
-                    calendar_day = driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir}]/span[{day_col_num}]/a").text
-                except:
-                    calendar_day = ""                
-                # 공백으로 일자가 아닌 경우
-                if len(calendar_day) == 0:
-                    print(f"{ir}번째는 일자가 아닙니다.")
-                    continue
-                # 가져온 달력 일자를 선택
-                try:
-                    driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{ir}]/span[{day_col_num}]/a").click()
-                except:
-                    # 회색의 경우 클릭이 안됨
-                    print(f"{calendar_day}일은 선택할 수 없는 일자입니다.")
-                    continue
-                # 제대로 일자 선택이 됐다면 사이트 빈자리 추출
-                empty_cnt_a, empty_cnt_b, empty_cnt_c = site_count()
-                # 존에 빈자리가 있었다면
-                if ((zone_cd == "A" and empty_cnt_a > 0) or (zone_cd == "B" and empty_cnt_b > 0) or (zone_cd == "C" and empty_cnt_c > 0)):
-                    break
-                else:
-                    print(f"존 {zone_cd}에 빈자리가 자리가 없습니다.")
-        else:
-            time.sleep(0.5)
+    # 예약하기 버튼이 생성됐는지 확인. 있다면 화면이 떴다는 의미
+    while True:
+        try:
+            rsv_btn = driver.find_element_by_xpath("/html/body/div[4]/div[1]/div/div[9]/div[2]/button").text
+            time.sleep(0.1)
+            break
+        except:
+            time.sleep(0.5)                
+    
+    # 주, 요일 설정
+    week_num = list_args[1] + 1
+    day_col_num = list_args[2]
+    # 달력의 일자 가져오기
+    while True:
+        try:
+            calendar_day = driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{week_num}]/span[{day_col_num}]/a").text
+            break
+        except:
+            time.sleep(0.1)
+    
+    # 가져온 달력 일자를 선택
+    while True:
+        try:
+            driver.find_element_by_xpath(f"/html/body/div[4]/div[1]/div/div[3]/div[2]/div[{week_num}]/span[{day_col_num}]/a").click()
+            break
+        except:
+            time.sleep(0.1)
+
+    # 제대로 일자 선택이 됐다면 사이트 빈자리 추출
+    empty_cnt_a, empty_cnt_b, empty_cnt_c = site_count()
+    # 존에 빈자리가 있었다면
+    if ((zone_cd == "A" and empty_cnt_a == 0) or (zone_cd == "B" and empty_cnt_b == 0) or (zone_cd == "C" and empty_cnt_c == 0)):
+        return False
+
     # 존에 맞는 빈자리를 찾지 못하고 나왔다면
     if ((zone_cd == "A" and empty_cnt_a == 0) or (zone_cd == "B" and empty_cnt_b == 0) or (zone_cd == "C" and empty_cnt_c == 0)):
         return False
@@ -215,19 +207,20 @@ def prepare_for_reservation(zone_cd):
     # 존에 대한 사이트 확인 및 빈자리 선택
     if click_empty_site(zone_cd):
         return True
+    else:
+        return False
 
 
 # 최초 팝업을 클릭해서 없애고 예약을 위한 사이트 체크로 들어감
-def execute(zone_cd):
+def execute():
     # 팝업 확인. 없을 수도 있음
     try:
         driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/form/div/span/a').click()
     except:
         time.sleep(0.1)
     # 예약 사전 준비 및 사이트 확인
-    if prepare_for_reservation(zone_cd):
-        # reservation_click()
-        pass
+    if prepare_for_reservation(list_args[0]):
+        reservation_click()
     else:
         print("예약 실패!!!")
         driver.close()
@@ -242,29 +235,35 @@ if __name__ == "__main__":
         # 존에 대한 리스트 생성
         while True:
             num = random.randint(1, position_cnt)
-            if num not in list_nums:
-                list_nums.append(num)    
-            if len(list_nums) == position_cnt: break
+            if num not in list_zone_position:
+                list_zone_position.append(num)    
+            if len(list_zone_position) == position_cnt: break
 
     # 프로그램에서 예약할 사이트 인자 받아오기
     parser = argparse.ArgumentParser(description='Karaban Site Argument. A, B, C')
     parser.add_argument('--zone', help='A, B, C')
+    parser.add_argument('--week', type=int, help='2 ~ 7')
+    parser.add_argument('--yoil', type=int, help='Sun ... Sat: 1 ~ 7')
     args = parser.parse_args()
-    print("Karaban Zone: ", args.zone.upper())
+
+    list_args.append(args.zone.upper())
+    list_args.append(args.week)
+    list_args.append(args.yoil)
+    print(f"카라반 존 {list_args[0]}.  {list_args[1]}째주, {dict_yoil[list_args[2]]}요일")
+
+    make_zone_position_num(list_args[0])
     
-    make_zone_position_num(args.zone.upper())
-    
-    # 10시 이전까지는 확인
-    while True:
-        # 시간 체크
-        now = datetime.datetime.now()
-        run_hms = now.strftime("%H%M%S")
-        # 10시가 되면 시작하고 종료
-        if run_hms >= "100001":
-            break
-        else:
-            # 대기
-            print(run_hms)
-            time.sleep(0.5)
+    # # 10시 이전까지는 확인
+    # while True:
+    #     # 시간 체크
+    #     now = datetime.datetime.now()
+    #     run_hms = now.strftime("%H%M%S")
+    #     # 10시가 되면 시작하고 종료
+    #     if run_hms > "100002":
+    #         break
+    #     else:
+    #         # 대기
+    #         print(run_hms)
+    #         time.sleep(0.5)
     # 실제 작업 시작
-    execute(args.zone.upper())
+    execute()
