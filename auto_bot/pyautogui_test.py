@@ -29,9 +29,11 @@ pg.scroll(10)
 # 드래그하기
 pg.drag(0, 300, 1, button='left')
 #542, 555
+"""
 while True:
     print(pg.position())
     time.sleep(1)
+"""
 # 마우스 이동 (x 좌표, y 좌표)
 pg.moveTo(468, 287)
 pg.click()

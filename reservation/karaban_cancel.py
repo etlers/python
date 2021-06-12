@@ -244,6 +244,6 @@ if __name__ == "__main__":
 
     list_args.append(args.week)
     list_args.append(args.yoil)
-    print(f"{list_args[0]}째주, {dict_yoil[list_args[1]]}요일")
+    print(f"{list_args[0]}째주 {dict_yoil[list_args[1]]}요일")
 
     execute()

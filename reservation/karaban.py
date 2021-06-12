@@ -242,14 +242,14 @@ if __name__ == "__main__":
     # 프로그램에서 예약할 사이트 인자 받아오기
     parser = argparse.ArgumentParser(description='Karaban Site Argument. A, B, C')
     parser.add_argument('--zone', help='A, B, C')
-    parser.add_argument('--week', type=int, help='2 ~ 7')
+    parser.add_argument('--week', type=int, help='1 ~ 6')
     parser.add_argument('--yoil', type=int, help='Sun ... Sat: 1 ~ 7')
     args = parser.parse_args()
 
     list_args.append(args.zone.upper())
     list_args.append(args.week)
     list_args.append(args.yoil)
-    print(f"카라반 존 {list_args[0]}.  {list_args[1]}째주, {dict_yoil[list_args[2]]}요일")
+    print(f"카라반 존 {list_args[0]}  {list_args[1]}째주 {dict_yoil[list_args[2]]}요일")
 
     make_zone_position_num(list_args[0])
     
