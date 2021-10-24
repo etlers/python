@@ -31,7 +31,7 @@ def get_normalized_datetime(datetime_value, delta):
 # 두 문자형 날짜 사이의 일시를 리스트로
 def get_datetime_list_between(start_string, end_string, delta):
     from_time = get_normalized_datetime(get_datetime(start_string), delta)
-    until_time = get_normalized_datetime(get_datetime(end_string) - timedelta(secons=1), delta)
+    until_time = get_normalized_datetime(get_datetime(end_string) - timedelta(seconds=1), delta)
     between_datetime = until_time - from_time
     minutes = int((between_datetime.days * 1440) + (between_datetime.seconds / 60))
     between_datetime_list = []

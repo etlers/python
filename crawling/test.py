@@ -1,6 +1,9 @@
-import random
+finn_td = '''
+<td class="">
+                                                                                                 8.29
 
-list_nums = []
-list_nums.append([5, 3, 6, 4, 2])
+                                                        </td>
+'''
 
-print(list_nums)
+finn_td_str = finn_td.replace(" ","").replace("\n","").split(">")[1].split("<")[0]
+print(finn_td_str)

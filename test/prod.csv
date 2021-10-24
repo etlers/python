@@ -1,0 +1,15 @@
+CD,ENM,KNM
+101,ref,냉장고
+102,kimchi,김치냉장고
+103,waterpuri,정수기
+201,washer,세탁기
+202,dryer,건조기
+203,styler,스타일러
+204,dishwasher,식기세척기
+221,wt_washer,원시타워세탁기
+222,wt_dryer,워시타워건조기
+301,oven,오븐
+303,cooktop,쿡탑
+401,ac,에어컨
+402,airpuri,공기청정기
+501,cleaner,로복청소기
