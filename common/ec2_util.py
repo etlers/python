@@ -41,6 +41,12 @@ def terminate_instance(instance_ids=[]):
     waiter = client.get_waiter('instance_stopped')
     waiter.wait(Instanceids=instance_ids)
 
+def stop_instance(instance_ids=[]):
+    client = get_client()
+    client.stop_instance(Instanceids=instance_ids)
+    waiter = client.get_waiter('instance_running')
+    waiter.wait(Instanceids=instance_ids)
+
 def start_instance(instance_ids=[]):
     client = get_client()
     client.start_instance(Instanceids=instance_ids)
