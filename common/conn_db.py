@@ -5,14 +5,14 @@ import MySQLdb
 
 
 # 데이터 트랜젝션
-def transaction_data(qry):
+def transaction_data(qry, db='stocks'):
     
     # MySQL Connection 연결
     conn = pymysql.connect(
         host='localhost', 
         user='etlers', 
         password='wndyd', 
-        db='stocks', 
+        db=db, 
         charset='utf8'
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)

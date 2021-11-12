@@ -113,7 +113,7 @@ def generate_sha_hash(data, salt):
     return hashlib.sha256(data.encode()).hexdigest()
 
 def generate_sha_hash_array(datas, salt):
-    return lsit(map(lambda data: generate_sha_hash(data, salt), datas))
+    return list(map(lambda data: generate_sha_hash(data, salt), datas))
 
 def deidentify(df, store_flag, access_key, secret_key, bucket_name, db_info=None, region=None):
     bucket_name = bucket_name.replace("result", "profile")
